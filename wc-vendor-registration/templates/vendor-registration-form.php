@@ -15,12 +15,17 @@
 	</p>
 
 	<p class="form-row form-row-first">
-		<label for="username"><?php _e( 'Username or email', 'ss-wc-vendor-registration' ); ?> <span class="required">*</span></label>
-		<input type="text" class="input-text" name="username" id="username" />
+		<label for="username"><?php _e( 'Username', 'ss-wc-vendor-registration' ); ?> <span class="required">*</span></label>
+		<input type="text" class="input-text" name="username" id="username" value="<?php if ( ! empty( $_POST['username'] ) ) esc_attr_e( $_POST['username'] ); ?>" />
 	</p>
 	<p class="form-row form-row-last">
 		<label for="password"><?php _e( 'Password', 'ss-wc-vendor-registration' ); ?> <span class="required">*</span></label>
 		<input class="input-text" type="password" name="password" id="password" />
+	</p>
+
+	<p class="form-row form-row-wide">
+		<label for="email"><?php _e( 'Email Address', 'ss-wc-vendor-registration' ); ?> <span class="required">*</span></label>
+			<input type="text" class="input-text" name="email" id="email" value="<?php if ( ! empty( $_POST['email'] ) ) esc_attr_e( $_POST['email'] ); ?>" />
 	</p>
 
 	<div class="clear"></div>
@@ -55,10 +60,6 @@
 
 	<p class="alread_registered">
 		<?php _e( 'Already Registered?', 'ss-wc-vendor-registration' ); ?> <a href="<?php echo esc_url( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ); ?>"><?php _e( 'Login', 'ss-wc-vendor-registration' ); ?></a>
-	</p>
-
-	<p class="form-row form-row-wide">
-		
 	</p>
 
 	<div class="clear"></div>

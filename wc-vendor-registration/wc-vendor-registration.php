@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Vendor Registration
  * Plugin URI:  https://github.com/Sebs-Studio/WooCommerce-Vendor-Registration
  * Description: Allows users to register as a vendor and create a store on your e-commerce marketplace site and add their products. Requires WooCommerce Product Vendors!
- * Version:     0.0.2
+ * Version:     0.0.3
  * Author:      Sebs Studio
  * Author URI:  http://www.sebs-studio.com
  * Text Domain: ss-wc-vendor-registration
@@ -20,6 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ## Provide a shortcode to insert registration page.
 ## ------------------------------------------------
 
+## What does the plugin need?
+## --------------------------
+## Send the newly registered user an email saying 
+## thank you for registering as a vendor.
+## ----------------------------------------------
+
 /**
  * This runs once the plugin is activated.
  *
@@ -30,6 +36,17 @@ function ss_wc_vendor_registration_activate(){
 	ss_wc_create_user_role_vendor(); // Register new user role.
 } // END ss_wc_vendor_registration_activate()
 register_activation_hook( __FILE__, 'ss_wc_vendor_registration_activate' );
+
+/**
+* This runs once the plugin is deactivated.
+*
+* @since  0.0.3
+* @access public
+*/
+function ss_wc_vendor_registration_deactivate(){
+	ss_wc_vendor_remove_user_role(); // Unregister user role.
+} // END ss_wc_vendor_registration_deactivate()
+register_deactivation_hook( __FILE__, 'ss_wc_vendor_registration_deactivate' );
 
 /**
  * Create user role and user capabilities for vendor.
@@ -71,8 +88,8 @@ function ss_wc_create_user_role_vendor() {
 			'edit_published_pages'   => false,
 			'edit_private_pages'     => false,
 			'edit_private_posts'     => false,
-			'edit_others_posts'      => true,
-			'edit_others_pages'      => true,
+			'edit_others_posts'      => false,
+			'edit_others_pages'      => false,
 			'publish_posts'          => false,
 			'publish_pages'          => false,
 			'delete_posts'           => false,
@@ -81,8 +98,8 @@ function ss_wc_create_user_role_vendor() {
 			'delete_private_posts'   => false,
 			'delete_published_pages' => false,
 			'delete_published_posts' => false,
-			'delete_others_posts'    => true,
-			'delete_others_pages'    => true,
+			'delete_others_posts'    => false,
+			'delete_others_pages'    => false,
 			'manage_categories'      => false,
 			'manage_links'           => false,
 			'moderate_comments'      => false,
@@ -133,13 +150,13 @@ function ss_wc_vendor_register_get_core_capabilities() {
 			"read_{$capability_type}",
 			"delete_{$capability_type}",
 			"edit_{$capability_type}s",
-			"edit_others_{$capability_type}s",
+			//"edit_others_{$capability_type}s",
 			//"publish_{$capability_type}s",
 			"read_private_{$capability_type}s",
 			"delete_{$capability_type}s",
 			"delete_private_{$capability_type}s",
 			"delete_published_{$capability_type}s",
-			"delete_others_{$capability_type}s",
+			//"delete_others_{$capability_type}s",
 			"edit_private_{$capability_type}s",
 			"edit_published_{$capability_type}s",
 
@@ -163,7 +180,7 @@ function ss_wc_vendor_register_get_core_capabilities() {
  * @since  0.0.1
  * @access public
  */
-function ss_wc_vendor_remove_roles() {
+function ss_wc_vendor_remove_user_role() {
 	global $wp_roles;
 
 	if ( ! class_exists( 'WP_Roles' ) ) {
@@ -269,7 +286,17 @@ function ss_wc_create_new_vendor( $email, $username = '', $password = '' ) {
 	return $vendor_id;
 } // END ss_wc_create_new_vendor()
 
-function ss_wc_validate_register_fields() {
+/**
+ * Validate the extra register fields.
+ *
+ * @param  string $username          Current username.
+ * @param  string $email             Current email.
+ * @param  object $validation_errors WP_Error object.
+ *
+ * @since 0.0.1
+ * @return void
+ */
+function ss_wc_validate_register_fields( $username, $email, $validation_errors ) {
 	if ( isset( $_POST['vendor_first_name'] ) && empty( $_POST['vendor_first_name'] ) ) {
 		$validation_errors->add( 'vendor_first_name_error', __( '<strong>Error</strong>: First name is required!', 'ss-wc-vendor-registration' ) );
 	}
@@ -277,6 +304,15 @@ function ss_wc_validate_register_fields() {
 	if ( isset( $_POST['vendor_last_name'] ) && empty( $_POST['vendor_last_name'] ) ) {
 		$validation_errors->add( 'vendor_last_name_error', __( '<strong>Error</strong>: Last name is required!.', 'ss-wc-vendor-registration' ) );
 	}
+
+	if ( isset( $_POST['store_name'] ) && empty( $_POST['store_name'] ) ) {
+		$validation_errors->add( 'vendor_store_name_error', __( '<strong>Error</strong>: A Store name is required!.', 'ss-wc-vendor-registration' ) );
+	}
+
+	if ( isset( $_POST['paypal_email'] ) && empty( $_POST['paypal_email'] ) ) {
+		$validation_errors->add( 'vendor_paypal_email_error', __( '<strong>Error</strong>: A PayPal account is required!.', 'ss-wc-vendor-registration' ) );
+	}
+
 } // END ss_wc_validate_register_fields()
 add_action( 'ss_wc_register_vendor', 'ss_wc_validate_register_fields', 10, 3 );
 
@@ -388,65 +424,64 @@ add_shortcode( 'vendor_registration', 'ss_wc_register_vendor_form_shortcode' );
  * @filter ss_wc_vendor_registration_redirect
  */
 function ss_wc_vendor_process_registration_form() {
-			if ( ! empty( $_POST['register'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'ss-wc-vendor-registration-form' ) ) {
+	if ( ! empty( $_POST['register'] ) && wp_verify_nonce( $_POST['_wpnonce'], 'ss-wc-vendor-registration-form' ) ) {
 
-			if ( 'no' === get_option( 'woocommerce_registration_generate_username' ) ) {
-				$_username = $_POST['username'];
-			} else {
-				$_username = '';
-			}
-
-			if ( 'no' === get_option( 'woocommerce_registration_generate_password' ) ) {
-				$_password = $_POST['password'];
-			} else {
-				$_password = '';
-			}
-
-			try {
-
-				$validation_error = new WP_Error();
-				$validation_error = apply_filters( 'ss_wc_process_vendor_registration_errors', $validation_error, $_username, $_password, $_POST['email'] );
-
-				if ( $validation_error->get_error_code() ) {
-					throw new Exception( '<strong>' . __( 'Error', 'ss-wc-vendor-registration' ) . ':</strong> ' . $validation_error->get_error_message() );
-				}
-
-			} catch ( Exception $e ) {
-
-				wc_add_notice( $e->getMessage(), 'error' );
-				return;
-
-			}
-
-			$username   = ! empty( $_username ) ? wc_clean( $_username ) : '';
-			$email      = ! empty( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
-			$password   = $_password;
-
-			// Anti-spam trap
-			/*if ( ! empty( $_POST['email_2'] ) ) {
-				wc_add_notice( '<strong>' . __( 'ERROR', 'ss-wc-vendor-registration' ) . '</strong>: ' . __( 'Anti-spam field was filled in.', 'ss-wc-vendor-registration' ), 'error' );
-				return;
-			}*/
-
-			$new_customer = ss_wc_create_new_vendor( $email, $username, $password );
-
-			if ( is_wp_error( $new_customer ) ) {
-				wc_add_notice( $new_customer->get_error_message(), 'error' );
-				return;
-			}
-
-			wc_set_customer_auth_cookie( $new_customer );
-
-			// Redirect
-			if ( wp_get_referer() ) {
-				$redirect = esc_url( wp_get_referer() );
-			} else {
-				$redirect = esc_url( get_permalink( wc_get_page_id( 'myaccount' ) ) );
-			}
-
-			wp_redirect( apply_filters( 'ss_wc_vendor_registration_redirect', $redirect ) );
-			exit;
+		if ( 'no' === get_option( 'woocommerce_registration_generate_username' ) ) {
+			$_username = $_POST['username'];
+		} else {
+			$_username = '';
 		}
+
+		if ( 'no' === get_option( 'woocommerce_registration_generate_password' ) ) {
+			$_password = $_POST['password'];
+		} else {
+			$_password = '';
+		}
+
+		try {
+
+			$validation_error = new WP_Error();
+			$validation_error = apply_filters( 'ss_wc_process_vendor_registration_errors', $validation_error, $_username, $_password, $_POST['email'] );
+
+			if ( $validation_error->get_error_code() ) {
+				throw new Exception( '<strong>' . __( 'Error', 'ss-wc-vendor-registration' ) . ':</strong> ' . $validation_error->get_error_message() );
+			}
+
+		} catch ( Exception $e ) {
+
+			wc_add_notice( $e->getMessage(), 'error' );
+			return;
+
+		}
+
+		$username   = ! empty( $_username ) ? wc_clean( $_username ) : '';
+		$email      = ! empty( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
+		$password   = $_password;
+
+		// Anti-spam trap
+		/*if ( ! empty( $_POST['email_2'] ) ) {
+			wc_add_notice( '<strong>' . __( 'ERROR', 'ss-wc-vendor-registration' ) . '</strong>: ' . __( 'Anti-spam field was filled in.', 'ss-wc-vendor-registration' ), 'error' );
+			return;
+		}*/
+
+		$new_customer = ss_wc_create_new_vendor( $email, $username, $password );
+
+		if ( is_wp_error( $new_customer ) ) {
+			wc_add_notice( $new_customer->get_error_message(), 'error' );
+			return;
+		}
+
+		wc_set_customer_auth_cookie( $new_customer );
+
+		// Redirect
+		if ( wp_get_referer() ) {
+			$redirect = esc_url( wp_get_referer() );
+		} else {
+			$redirect = esc_url( get_permalink( wc_get_page_id( 'myaccount' ) ) );
+		}
+
+		wp_redirect( apply_filters( 'ss_wc_vendor_registration_redirect', $redirect ) );
+		exit;
 	}
 } // END ss_wc_vendor_process_registration_form()
 add_action( 'init', 'ss_wc_vendor_process_registration_form' );

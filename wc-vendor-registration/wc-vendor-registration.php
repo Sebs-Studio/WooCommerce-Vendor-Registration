@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Vendor Registration
  * Plugin URI:  https://github.com/Sebs-Studio/WooCommerce-Vendor-Registration
  * Description: Allows users to register as a vendor and create a store on your e-commerce marketplace site and add their products. Requires WooCommerce Product Vendors!
- * Version:     0.0.1
+ * Version:     0.0.2
  * Author:      Sebs Studio
  * Author URI:  http://www.sebs-studio.com
  * Text Domain: ss-wc-vendor-registration

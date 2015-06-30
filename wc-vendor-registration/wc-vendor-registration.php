@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ## What the plugin does!
 ## ---------------------
 ## Register User as new user role called Vendor.
-## Validate form details
-## Create vendor shop
+## Validates form details
+## Creates vendor shop
 ## Provide a shortcode to insert registration page.
 ## ------------------------------------------------
 
@@ -218,7 +218,7 @@ function ss_wc_create_new_vendor( $email, $username = '', $password = '' ) {
 	}
 
 	if ( email_exists( $email ) ) {
-		return new WP_Error( 'registration-error', __( 'An account is already registered with your email address. Please login.', 'ss-wc-vendor-registration' ) );
+		return new WP_Error( 'registration-error', sprintf( __( 'An account is already registered with your email address. Please <a href="%s">login</a>.', 'ss-wc-vendor-registration' ), esc_url( get_permalink( get_option( 'woocommerce_myaccount_page_id' ) ) ) ) );
 	}
 
 	// Handle username creation
@@ -343,13 +343,13 @@ function ss_wc_create_vendor_store( $vendor_id ) {
 		'description'       => trim( $_POST['store_description'] ),
 		'vendor_admins'     => $vendor_id,
 		'vendor_commission' => '', // Left blank, up to the admin to decide commission rate.
-		'paypal_email'      => $_POST['paypal_email']
+		'paypal_email'      => trim( $_POST['paypal_email'] )
 	);
 
 	// Create vendor store.
 	$new_vendor_id = wp_insert_term( $store_details['name'], 'shop_vendor', array(
-		'description' => $shop_details['description'],
-		'slug'        => trim( strtolower( str_replace( ' ', '-', $shop_details['name'] ) ) ),
+		'description' => $store_details['description'],
+		'slug'        => trim( strtolower( str_replace( ' ', '-', $store_details['name'] ) ) ),
 		'parent'      => ''
 	) );
 
@@ -357,7 +357,11 @@ function ss_wc_create_vendor_store( $vendor_id ) {
 		// Get term id, set default to 0 if not set.
 		$new_vendor_id = isset( $new_vendor_id['term_id'] ) ? $new_vendor_id['term_id'] : 0;
 
-		do_action( 'ss_wc_save_vendor_details', $vendor_id, $new_vendor_id, $store_details );
+		do_action( 'ss_wc_save_store_details', $vendor_id, $new_vendor_id, $store_details );
+	} else {
+		$error_log = array( 'vendor_id' => $vendor_id, 'new_vendor_id' => $new_vendor_id, 'store_details' => $store_details );
+		$store_error = new WP_Error( 'creating-store-error', __( "Unable to create store. Please see error log for details.", "ss-wc-vendor-registration" ), $error_log );
+		return $store_error;
 	}
 
 } // END ss_wc_create_vendor_store()
@@ -385,6 +389,7 @@ function ss_wc_save_store_details( $vendor_id, $new_vendor_id, $store_details ) 
 	// Apply the ID of the Vendor
 	$vendor = $store_details['vedor_admins'];
 	$vendor_date['vendor_admins'] = $vendor;
+	update_user_meta( $vendor_id, 'product_vendor', $new_vendor_id );
 
 	update_option( ss_wc_vendor_reg_get_token() . '_' . $new_vendor_id, $vendor_data );
 
@@ -395,7 +400,7 @@ function ss_wc_save_store_details( $vendor_id, $new_vendor_id, $store_details ) 
 
 	wp_update_term( $new_vendor_id, ss_wc_vendor_reg_get_token(), $args );
 } // END ss_wc_save_store_details()
-add_action( 'ss_wc_save_vendor_details', 'ss_wc_save_store_details', 3 );
+add_action( 'ss_wc_save_store_details', 'ss_wc_save_store_details', 3 );
 
 /**
  * Insert the vendor regsitration form where you
@@ -458,20 +463,15 @@ function ss_wc_vendor_process_registration_form() {
 		$email      = ! empty( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
 		$password   = $_password;
 
-		// Anti-spam trap
-		/*if ( ! empty( $_POST['email_2'] ) ) {
-			wc_add_notice( '<strong>' . __( 'ERROR', 'ss-wc-vendor-registration' ) . '</strong>: ' . __( 'Anti-spam field was filled in.', 'ss-wc-vendor-registration' ), 'error' );
-			return;
-		}*/
+		// Create new vendor
+		$new_vendor = ss_wc_create_new_vendor( $email, $username, $password );
 
-		$new_customer = ss_wc_create_new_vendor( $email, $username, $password );
-
-		if ( is_wp_error( $new_customer ) ) {
-			wc_add_notice( $new_customer->get_error_message(), 'error' );
+		if ( is_wp_error( $new_vendor ) ) {
+			wc_add_notice( $new_vendor->get_error_message(), 'error' );
 			return;
 		}
 
-		wc_set_customer_auth_cookie( $new_customer );
+		wc_set_customer_auth_cookie( $new_vendor );
 
 		// Redirect
 		if ( wp_get_referer() ) {
@@ -484,4 +484,4 @@ function ss_wc_vendor_process_registration_form() {
 		exit;
 	}
 } // END ss_wc_vendor_process_registration_form()
-add_action( 'init', 'ss_wc_vendor_process_registration_form' );
+add_action( 'init', 'ss_wc_vendor_process_registration_form', 60 );

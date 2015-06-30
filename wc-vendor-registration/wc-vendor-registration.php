@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Vendor Registration
  * Plugin URI:  https://github.com/Sebs-Studio/WooCommerce-Vendor-Registration
  * Description: Allows users to register as a vendor and create a store on your e-commerce marketplace site and add their products. Requires WooCommerce Product Vendors!
- * Version:     0.0.3
+ * Version:     0.0.4
  * Author:      Sebs Studio
  * Author URI:  http://www.sebs-studio.com
  * Text Domain: ss-wc-vendor-registration
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ## ---------------------
 ## Register User as new user role called Vendor.
 ## Validates form details
-## Creates vendor shop
+## Creates vendors store
 ## Provide a shortcode to insert registration page.
 ## ------------------------------------------------
 
@@ -150,13 +150,12 @@ function ss_wc_vendor_register_get_core_capabilities() {
 			"read_{$capability_type}",
 			"delete_{$capability_type}",
 			"edit_{$capability_type}s",
-			//"edit_others_{$capability_type}s",
-			//"publish_{$capability_type}s",
+			"edit_others_{$capability_type}s",
 			"read_private_{$capability_type}s",
 			"delete_{$capability_type}s",
 			"delete_private_{$capability_type}s",
 			"delete_published_{$capability_type}s",
-			//"delete_others_{$capability_type}s",
+			"delete_others_{$capability_type}s",
 			"edit_private_{$capability_type}s",
 			"edit_published_{$capability_type}s",
 
@@ -336,13 +335,17 @@ function ss_wc_save_vendor_details( $vendor_id ) {
 } // END ss_wc_save_vendor_details()
 add_action( 'ss_wc_created_vendor', 'ss_wc_save_vendor_details' );
 
-// Create the vendors store.
+/**
+ * Create the vendors store.
+ *
+ * @filter ss_wc_vendor_commission_rate_on_registration
+ */
 function ss_wc_create_vendor_store( $vendor_id ) {
 	$store_details = array(
 		'name'              => trim( $_POST['store_name'] ),
 		'description'       => trim( $_POST['store_description'] ),
 		'vendor_admins'     => $vendor_id,
-		'vendor_commission' => '', // Left blank, up to the admin to decide commission rate.
+		'vendor_commission' => apply_filter( 'ss_wc_vendor_commission_rate_on_registration', 0 ), // Can be filtered to change commission rate on registration.
 		'paypal_email'      => trim( $_POST['paypal_email'] )
 	);
 
@@ -379,28 +382,30 @@ function ss_wc_save_store_details( $vendor_id, $new_vendor_id, $store_details ) 
 	}
 
 	// PayPal account email address
-	$paypal_address = $store_details['paypal_email'];
-	$vendor_data['paypal_email'] = $paypal_address;
+	$paypal_email = $store_details['paypal_email'];
+	if( $paypal_email || strlen( $paypal_email ) > 0 || $paypal_email != '' ) {
+		$vendor_data['paypal_email'] = $paypal_email;
+	}
 
 	// Commission
-	$commission = $store_details['commission'];
-	$vendor_date['vendor_commission'] = $commission;
+	$commission = $store_details['vendor_commission'];
+	if( $commission || strlen( $commission ) > 0 || $commission != '' ) {
+		$vendor_data['commission'] = $commission;
+	}
 
 	// Apply the ID of the Vendor
-	$vendor = $store_details['vedor_admins'];
-	$vendor_date['vendor_admins'] = $vendor;
+	$vendor_admin = $store_details['vendor_admins'];
+	if( isset( $vendor_admin ) && count( $vendor_admin > 0 ) ) {
+		$vendor_data['admins'] = $vendor_admin;
+	}
+
 	update_user_meta( $vendor_id, 'product_vendor', $new_vendor_id );
 
 	update_option( ss_wc_vendor_reg_get_token() . '_' . $new_vendor_id, $vendor_data );
 
-	// Vendor description
-	$args = array(
-		'description' => $store_details['description']
-	);
-
-	wp_update_term( $new_vendor_id, ss_wc_vendor_reg_get_token(), $args );
+	wp_die( print_r( array( 'token' => ss_wc_vendor_reg_get_token(), 'vendor_id' => $vendor_id, 'new_vendor_id' => $new_vendor_id, 'vendor_data' => $vendor_data ) ) );
 } // END ss_wc_save_store_details()
-add_action( 'ss_wc_save_store_details', 'ss_wc_save_store_details', 3 );
+add_action( 'ss_wc_save_store_details', 'ss_wc_save_store_details', 10, 3 );
 
 /**
  * Insert the vendor regsitration form where you

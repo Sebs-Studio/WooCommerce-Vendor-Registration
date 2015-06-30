@@ -345,7 +345,7 @@ function ss_wc_create_vendor_store( $vendor_id ) {
 		'name'              => trim( $_POST['store_name'] ),
 		'description'       => trim( $_POST['store_description'] ),
 		'vendor_admins'     => $vendor_id,
-		'vendor_commission' => apply_filter( 'ss_wc_vendor_commission_rate_on_registration', 0 ), // Can be filtered to change commission rate on registration.
+		'vendor_commission' => apply_filters( 'ss_wc_vendor_commission_rate_on_registration', 0 ), // Can be filtered to change commission rate on registration.
 		'paypal_email'      => trim( $_POST['paypal_email'] )
 	);
 

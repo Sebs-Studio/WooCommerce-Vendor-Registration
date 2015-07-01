@@ -1,0 +1,131 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: WooCommerce Vendor Registration\n"
+"POT-Creation-Date: 2015-07-01 23:07+0200\n"
+"PO-Revision-Date: 2015-07-01 22:48+0100\n"
+"Last-Translator: \n"
+"Language-Team: Sebastien Dumont <mailme@sebastiendumont.com>\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.2\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n;_x\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: templates/vendor-registration-form.php:8
+msgid "First name"
+msgstr ""
+
+#: templates/vendor-registration-form.php:13
+msgid "Last name"
+msgstr ""
+
+#: templates/vendor-registration-form.php:18
+msgid "Username"
+msgstr ""
+
+#: templates/vendor-registration-form.php:22
+msgid "Password"
+msgstr ""
+
+#: templates/vendor-registration-form.php:27
+msgid "Email Address"
+msgstr ""
+
+#: templates/vendor-registration-form.php:34
+msgid "Your Store Details"
+msgstr ""
+
+#: templates/vendor-registration-form.php:38
+msgid "Store Name"
+msgstr ""
+
+#: templates/vendor-registration-form.php:40
+msgid "What is the name of your store?"
+msgstr ""
+
+#: templates/vendor-registration-form.php:43
+msgid "PayPal Email Address"
+msgstr ""
+
+#: templates/vendor-registration-form.php:45
+msgid "The PayPal email address of the vendor where their profits will be delivered."
+msgstr ""
+
+#: templates/vendor-registration-form.php:49
+msgid "Store Description"
+msgstr ""
+
+#: templates/vendor-registration-form.php:57
+msgid "Register"
+msgstr ""
+
+#: templates/vendor-registration-form.php:62
+msgid "Already Registered?"
+msgstr ""
+
+#: templates/vendor-registration-form.php:62
+msgid "Login"
+msgstr ""
+
+#: wc-vendor-registration.php:70
+msgid "Vendor"
+msgstr ""
+
+#: wc-vendor-registration.php:216
+msgid "Please provide a valid email address."
+msgstr ""
+
+#: wc-vendor-registration.php:220
+#, php-format
+msgid "An account is already registered with your email address. Please <a href=\"%s\">login</a>."
+msgstr ""
+
+#: wc-vendor-registration.php:229
+msgid "Please enter a valid account username."
+msgstr ""
+
+#: wc-vendor-registration.php:233
+msgid "An account is already registered with that username. Please choose another."
+msgstr ""
+
+#: wc-vendor-registration.php:254
+msgid "Please enter an account password."
+msgstr ""
+
+#: wc-vendor-registration.php:280
+msgid "ERROR"
+msgstr ""
+
+#: wc-vendor-registration.php:280
+msgid "Couldn&#8217;t register you&hellip; please contact us if you continue to have problems."
+msgstr ""
+
+#: wc-vendor-registration.php:300
+msgid "<strong>Error</strong>: First name is required!"
+msgstr ""
+
+#: wc-vendor-registration.php:304
+msgid "<strong>Error</strong>: Last name is required!."
+msgstr ""
+
+#: wc-vendor-registration.php:308
+msgid "<strong>Error</strong>: A Store name is required!."
+msgstr ""
+
+#: wc-vendor-registration.php:312
+msgid "<strong>Error</strong>: A PayPal account is required!."
+msgstr ""
+
+#: wc-vendor-registration.php:366
+msgid "Unable to create store. Please see error log for details."
+msgstr ""
+
+#: wc-vendor-registration.php:457
+msgid "Error"
+msgstr ""

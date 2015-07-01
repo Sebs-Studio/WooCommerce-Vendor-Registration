@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Vendor Registration
  * Plugin URI:  https://github.com/Sebs-Studio/WooCommerce-Vendor-Registration
  * Description: Allows users to register as a vendor and create a store on your e-commerce marketplace site and add their products. Requires WooCommerce Product Vendors!
- * Version:     0.0.4
+ * Version:     0.0.5
  * Author:      Sebs Studio
  * Author URI:  http://www.sebs-studio.com
  * Text Domain: ss-wc-vendor-registration
@@ -402,8 +402,6 @@ function ss_wc_save_store_details( $vendor_id, $new_vendor_id, $store_details ) 
 	update_user_meta( $vendor_id, 'product_vendor', $new_vendor_id );
 
 	update_option( ss_wc_vendor_reg_get_token() . '_' . $new_vendor_id, $vendor_data );
-
-	wp_die( print_r( array( 'token' => ss_wc_vendor_reg_get_token(), 'vendor_id' => $vendor_id, 'new_vendor_id' => $new_vendor_id, 'vendor_data' => $vendor_data ) ) );
 } // END ss_wc_save_store_details()
 add_action( 'ss_wc_save_store_details', 'ss_wc_save_store_details', 10, 3 );
 
@@ -490,3 +488,38 @@ function ss_wc_vendor_process_registration_form() {
 	}
 } // END ss_wc_vendor_process_registration_form()
 add_action( 'init', 'ss_wc_vendor_process_registration_form', 60 );
+
+/**
+ * Load Localisation files.
+ *
+ * Note: the first-loaded translation file overrides any 
+ * following ones if the same translation is present.
+ *
+ * @since  0.0.5
+ * @access public
+ * @return void
+ */
+function ss_wc_vendor_registration_load_textdomain() {
+	// Set filter for plugin's languages directory
+	$lang_dir = dirname( plugin_basename( PLUGIN_NAME_FILE ) ) . '/languages/';
+	$lang_dir = apply_filters( 'ss_wc_vendor_registration_languages_directory', $lang_dir );
+	// Traditional WordPress plugin locale filter
+	$locale = apply_filters( 'plugin_locale',  get_locale(), $this->text_domain );
+	$mofile = sprintf( '%1$s-%2$s.mo', $this->text_domain, $locale );
+	// Setup paths to current locale file
+	$mofile_local  = $lang_dir . $mofile;
+	$mofile_global = WP_LANG_DIR . '/' . $this->text_domain . '/' . $mofile;
+	if ( file_exists( $mofile_global ) ) {
+		// Look in global /wp-content/languages/ss-wc-vendor-registration/ folder
+		load_textdomain( $this->text_domain, $mofile_global );
+	}
+	elseif ( file_exists( $mofile_local ) ) {
+		// Look in local /wp-content/plugins/ss-wc-vendor-registration/languages/ folder
+		load_textdomain( $this->text_domain, $mofile_local );
+	}
+	else {
+		// Load the default language files
+		load_plugin_textdomain( $this->text_domain, false, $lang_dir );
+	}
+}
+add_action( 'init', 'ss_wc_vendor_registration_load_textdomain' );

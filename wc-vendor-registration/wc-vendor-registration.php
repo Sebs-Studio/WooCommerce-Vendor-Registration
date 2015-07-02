@@ -521,7 +521,7 @@ function ss_wc_vendor_registration_load_textdomain() {
 	$lang_dir = apply_filters( 'ss_wc_vendor_registration_languages_directory', $lang_dir );
 	// Traditional WordPress plugin locale filter
 	$locale = apply_filters( 'plugin_locale',  get_locale(), 'ss-wc-vendor-registration' );
-	$mofile = sprintf( '%1$s-%2$s.mo', $this->text_domain, $locale );
+	$mofile = sprintf( '%1$s-%2$s.mo', 'ss-wc-vendor-registration', $locale );
 	// Setup paths to current locale file
 	$mofile_local  = $lang_dir . $mofile;
 	$mofile_global = WP_LANG_DIR . '/ss-wc-vendor-registration/' . $mofile;

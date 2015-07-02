@@ -338,14 +338,24 @@ add_action( 'ss_wc_created_vendor', 'ss_wc_save_vendor_details' );
 /**
  * Create the vendors store.
  *
+ * @since  0.0.1
+ * @access public
  * @filter ss_wc_vendor_commission_rate_on_registration
  */
 function ss_wc_create_vendor_store( $vendor_id ) {
+	// The base commission set in the vendors settings.
+	$vendors_commission = get_option( 'woocommerce_product_vendors_base_commission' );
+	// Check that a base commission has been set. If empty we set a default commission percentage.
+	if ( empty( $vendors_commission ) ) {
+		$vendors_commission = 50; // Default is 50%
+	}
+
+	// Now we pass through the store details.
 	$store_details = array(
 		'name'              => trim( $_POST['store_name'] ),
 		'description'       => trim( $_POST['store_description'] ),
 		'vendor_admins'     => $vendor_id,
-		'vendor_commission' => apply_filters( 'ss_wc_vendor_commission_rate_on_registration', 0 ), // Can be filtered to change commission rate on registration.
+		'vendor_commission' => apply_filters( 'ss_wc_vendor_commission_rate_on_registration', $vendors_commission ), // Can be filtered to change commission rate on registration.
 		'paypal_email'      => trim( $_POST['paypal_email'] )
 	);
 
@@ -411,10 +421,16 @@ add_action( 'ss_wc_save_store_details', 'ss_wc_save_store_details', 10, 3 );
  *
  * @how Insert [vendor_registration] in your page.
  * @version 0.0.1
+ * @access  public
+ * @filter  ss_wc_vendor_already_registered_redirect
  */
 function ss_wc_register_vendor_form_shortcode() {
-	// If the user is already logged in, return nothing.
-	if ( is_user_logged_in() ) { return; }
+	// If the user is already logged in, redirect to the account page or the page that was filtered to.
+	if ( is_user_logged_in() ) {
+		$redirect = esc_url( get_permalink( wc_get_page_id( 'myaccount' ) ) );
+		wp_redirect( apply_filters( 'ss_wc_vendor_already_registered_redirect', $redirect ) );
+		exit;
+	}
 
 	if ( ! is_user_logged_in() ) {
 		include_once( 'templates/vendor-registration-form.php' );

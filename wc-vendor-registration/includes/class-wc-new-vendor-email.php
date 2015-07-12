@@ -81,8 +81,12 @@ class WC_Email_New_Vendor_Account extends WC_Email {
 		$this->recipient          = $this->user_email;
 		$this->password_generated = $password_generated;
 
+		// bail if no email is found
+		if ( ! $this->get_recipient() )
+			return;
+
 		// woohoo, send the email!
-		$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+		$this->send( $this->recipient, $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
 	}
 
 	/**

@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Vendor Registration
  * Plugin URI:  https://github.com/Sebs-Studio/WooCommerce-Vendor-Registration
  * Description: Allows users to register as a vendor and create a store on your e-commerce marketplace site and add their products. Requires WooCommerce Product Vendors!
- * Version:     0.0.5
+ * Version:     0.0.6
  * Author:      Sebs Studio
  * Author URI:  http://www.sebs-studio.com
  * Text Domain: ss-wc-vendor-registration
@@ -13,18 +13,17 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 ## What the plugin does!
-## ---------------------
+## ------------------------------------------------
 ## Register User as new user role called Vendor.
 ## Validates form details
 ## Creates vendors store
 ## Provide a shortcode to insert registration page.
+## Sends an email to newly registered vendors.
 ## ------------------------------------------------
 
-## What does the plugin need?
-## --------------------------
-## Send the newly registered user an email saying 
-## thank you for registering as a vendor.
-## ----------------------------------------------
+function ss_wc_vendor_registration_plugin_file() {
+	return __FILE__;
+}
 
 /**
  * This runs once the plugin is activated.
@@ -136,11 +135,10 @@ function ss_wc_vendor_register_get_core_capabilities() {
 	$capabilities = array();
 
 	$capabilities['core'] = array(
-		'manage_woocommerce',
 		'view_woocommerce_reports'
 	);
 
-	$capability_types = apply_filters( 'ss_wc_vendor_register_capability_post_types', array( 'media', 'product', 'shop_order', 'shop_coupon' ) );
+	$capability_types = apply_filters( 'ss_wc_vendor_register_capability_post_types', array( 'media', 'product' ) );
 
 	foreach( $capability_types as $capability_type ) {
 
@@ -160,10 +158,6 @@ function ss_wc_vendor_register_get_core_capabilities() {
 			"edit_published_{$capability_type}s",
 
 			// Terms
-			"manage_{$capability_type}_terms",
-			"edit_{$capability_type}_terms",
-			"delete_{$capability_type}_terms",
-			"assign_{$capability_type}_terms",
 			"upload_files",
 			"manage_bookings",
 		);
@@ -373,7 +367,7 @@ function ss_wc_create_vendor_store( $vendor_id ) {
 		do_action( 'ss_wc_save_store_details', $vendor_id, $new_vendor_id, $store_details );
 	} else {
 		$error_log = array( 'vendor_id' => $vendor_id, 'new_vendor_id' => $new_vendor_id, 'store_details' => $store_details );
-		$store_error = new WP_Error( 'creating-store-error', __( "Unable to create store. Please see error log for details.", "ss-wc-vendor-registration" ), $error_log );
+		$store_error = new WP_Error( 'creating-store-error', __( 'Unable to create store. Please see error log for details.", "ss-wc-vendor-registration' ), $error_log );
 		return $store_error;
 	}
 
@@ -539,3 +533,21 @@ function ss_wc_vendor_registration_load_textdomain() {
 	}
 }
 add_action( 'init', 'ss_wc_vendor_registration_load_textdomain' );
+
+/**
+ * Adds a new email to the list of WooCommerce emails.
+ *
+ * @since  0.0.6
+ * @param  array $email_classes available email classes
+ * @return array filtered available email classes
+ */
+function ss_wc_vendor_registration_emails( $email_classes ) {
+	// Include email
+	require_once( 'includes/class-wc-new-vendor-email.php' );
+
+	// Add the email class to the list of email classes that WooCommerce loads
+	$email_classes['WC_Email_New_Vendor_Account'] = new WC_Email_New_Vendor_Account();
+
+	return $email_classes;
+}
+add_filter( 'woocommerce_email_classes', 'ss_wc_vendor_registration_emails' );

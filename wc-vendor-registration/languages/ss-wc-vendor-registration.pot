@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WooCommerce Vendor Registration\n"
-"POT-Creation-Date: 2015-07-01 23:07+0200\n"
+"POT-Creation-Date: 2015-07-12 02:08+0200\n"
 "PO-Revision-Date: 2015-07-01 22:48+0100\n"
 "Last-Translator: \n"
 "Language-Team: Sebastien Dumont <mailme@sebastiendumont.com>\n"
@@ -16,6 +16,83 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n;_x\n"
 "X-Poedit-SearchPath-0: .\n"
+
+#: includes/class-wc-new-vendor-email.php:34
+msgid "New Vendor"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:37
+msgid "Vendor \"new vendor\" emails are sent to the vendor when they sign up via the vendor registration form."
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:40
+msgid "Your vendor account on {site_title} is ready"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:41
+msgid "Welcome to {site_title} as a new vendor."
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:151
+msgid "Enable/Disable"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:153
+msgid "Enable this email notification"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:157
+msgid "Email subject"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:159
+#, php-format
+msgid "This controls the email subject line. Leave blank to use the default subject: <code>%s</code>."
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:164
+msgid "Email heading"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:166
+#, php-format
+msgid "This controls the main heading contained within the email notification. Leave blank to use the default heading: <code>%s</code>."
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:171
+msgid "Email type"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:173
+msgid "Choose which format of email to send."
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:190
+msgid "Plain text"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:194
+msgid "HTML"
+msgstr ""
+
+#: includes/class-wc-new-vendor-email.php:195
+msgid "Multipart"
+msgstr ""
+
+#: templates/emails/vendor-new-account.php:15
+#, php-format
+msgid "Thank you for registering as a vendor on %s. Your username is <strong>%s</strong>."
+msgstr ""
+
+#: templates/emails/vendor-new-account.php:19
+#, php-format
+msgid "Your password has been automatically generated: <strong>%s</strong>"
+msgstr ""
+
+#: templates/emails/vendor-new-account.php:23
+#, php-format
+msgid "You can access your account area to manage your products and view your sales. You can change your password here: %s."
+msgstr ""
 
 #: templates/vendor-registration-form.php:8
 msgid "First name"
@@ -73,59 +150,59 @@ msgstr ""
 msgid "Login"
 msgstr ""
 
-#: wc-vendor-registration.php:70
+#: wc-vendor-registration.php:69
 msgid "Vendor"
 msgstr ""
 
-#: wc-vendor-registration.php:216
+#: wc-vendor-registration.php:210
 msgid "Please provide a valid email address."
 msgstr ""
 
-#: wc-vendor-registration.php:220
+#: wc-vendor-registration.php:214
 #, php-format
 msgid "An account is already registered with your email address. Please <a href=\"%s\">login</a>."
 msgstr ""
 
-#: wc-vendor-registration.php:229
+#: wc-vendor-registration.php:223
 msgid "Please enter a valid account username."
 msgstr ""
 
-#: wc-vendor-registration.php:233
+#: wc-vendor-registration.php:227
 msgid "An account is already registered with that username. Please choose another."
 msgstr ""
 
-#: wc-vendor-registration.php:254
+#: wc-vendor-registration.php:248
 msgid "Please enter an account password."
 msgstr ""
 
-#: wc-vendor-registration.php:280
+#: wc-vendor-registration.php:274
 msgid "ERROR"
 msgstr ""
 
-#: wc-vendor-registration.php:280
+#: wc-vendor-registration.php:274
 msgid "Couldn&#8217;t register you&hellip; please contact us if you continue to have problems."
 msgstr ""
 
-#: wc-vendor-registration.php:300
+#: wc-vendor-registration.php:294
 msgid "<strong>Error</strong>: First name is required!"
 msgstr ""
 
-#: wc-vendor-registration.php:304
+#: wc-vendor-registration.php:298
 msgid "<strong>Error</strong>: Last name is required!."
 msgstr ""
 
-#: wc-vendor-registration.php:308
+#: wc-vendor-registration.php:302
 msgid "<strong>Error</strong>: A Store name is required!."
 msgstr ""
 
-#: wc-vendor-registration.php:312
+#: wc-vendor-registration.php:306
 msgid "<strong>Error</strong>: A PayPal account is required!."
 msgstr ""
 
-#: wc-vendor-registration.php:366
-msgid "Unable to create store. Please see error log for details."
+#: wc-vendor-registration.php:370
+msgid "Unable to create store. Please see error log for details.\", \"ss-wc-vendor-registration"
 msgstr ""
 
-#: wc-vendor-registration.php:457
+#: wc-vendor-registration.php:465
 msgid "Error"
 msgstr ""
